@@ -17,6 +17,7 @@ import org.dom4j.io.SAXReader;
  * 解析XML
  * XML中，一部分是需要分开，有几个子标签就分为几部分。
  * 每个标签中都要取到 name 和 vaule。
+ * 现在的 List 中 只有一个 Map 使用 List 是为了 合并数据的时候方便
  * @author 赵文
  *
  */
@@ -67,12 +68,10 @@ public class ParsingXml {
 
 	/**
 	 * 根据 XML 文件的位置来解析 XML 文件
-	 * @param mainInfo: 主要标签的名字
-	 * @param docid: Name 可以重复的标签
 	 * @param xmlPath：xml文件的位置
 	 * @throws DocumentException 
 	 */
-	public List<Map<String,String>> parsingXml(String xmlPath, String mainInfo, String docid) throws DocumentException {
+	public List<Map<String,String>> parsingXml(String xmlPath) throws DocumentException {
 		SAXReader reader=new SAXReader();
         Document fromXml=reader.read(new File(xmlPath));  
         Element rootElement = fromXml.getRootElement();
@@ -127,10 +126,19 @@ public class ParsingXml {
 		//将都有的数据先整合到 mapAll 中
 		for (int z = 0; z < allHaveName.size(); z++) {
 			if (mapAll.containsKey(allHaveName.get(z))) { //如果 key 已存在
-				String addStrToStr =  mapAll.get(allHaveName.get(z)) + selfSplit2 + allHaveValue.get(z);
+				String addStrToStr = "";
+				if ("".equalsIgnoreCase(allHaveValue.get(z))) {
+					addStrToStr =  mapAll.get(allHaveName.get(z)) + selfSplit2 + " ";
+				}else {
+					addStrToStr =  mapAll.get(allHaveName.get(z)) + selfSplit2 + allHaveValue.get(z);
+				}
 				mapAll.put(allHaveName.get(z), addStrToStr);
 			}else {
-				mapAll.put(allHaveName.get(z), allHaveValue.get(z));
+				if ("".equalsIgnoreCase(allHaveValue.get(z))) {
+					mapAll.put(allHaveName.get(z), " ");
+				}else {
+					mapAll.put(allHaveName.get(z), allHaveValue.get(z));
+				}
 			}
 		}
 		mapInList.add(mapAll);

@@ -43,8 +43,8 @@ public class RecodeParsingXml {
  	 * 分隔符 默认为 逗号 ","
 	 * @return
 	 */
-	public String addValues() {
-		return this.addValues(",");
+	public String getAddValues() {
+		return this.getAddValues(",");
 	}
 	
 	/**
@@ -52,7 +52,7 @@ public class RecodeParsingXml {
 	 * @param splitSign : 分割符号
 	 * @return
 	 */
-	public String addValues(String splitSign) {
+	public String getAddValues(String splitSign) {
 		StringBuffer sb = new StringBuffer();
 		for (Map<String,String> map : mapInList) {
 			for (String str : map.keySet()) {
@@ -61,6 +61,16 @@ public class RecodeParsingXml {
 			}
 		}
 		return sb.toString().substring(0, sb.length()-1);
+	}
+	
+	/**
+	 * 根据 Map 中的 key 来获取值
+	 * 现在的 List 中 只有一个 Map 使用 List 是为了 合并数据的时候方便
+	 * @param key
+	 * @return
+	 */
+	public String getMapValues(String key){
+		return mapInList.get(0).get(key);
 	}
 	
 }

@@ -1,5 +1,7 @@
 package com.xmltostr;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -70,10 +72,11 @@ public class ParsingXml {
 	 * 根据 XML 文件的位置来解析 XML 文件
 	 * @param xmlPath：xml文件的位置
 	 * @throws DocumentException 
+	 * @throws FileNotFoundException 
 	 */
-	public List<Map<String,String>> parsingXml(String xmlPath) throws DocumentException {
+	public List<Map<String,String>> parsingXml(String xmlPath) throws DocumentException, FileNotFoundException {
 		SAXReader reader=new SAXReader();
-        Document fromXml=reader.read(new File(xmlPath));  
+        Document fromXml=reader.read(new FileInputStream(new File(xmlPath))); //直接 new File 在服务器上有时候不好使。  
         Element rootElement = fromXml.getRootElement();
         oldRootName = rootElement.getName();
         List<Map<String,String>> map = recursiveToGetInfo(rootElement);

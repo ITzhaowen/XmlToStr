@@ -1,7 +1,13 @@
 package com.xmltostr;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -82,7 +88,61 @@ public class ParsingXml {
         List<Map<String,String>> map = recursiveToGetInfo(rootElement);
         return map;
 	}
-
+	
+	/**
+	 * 如果XML文件的格式不正确，将他的格式转化，重新生成一个新的格式正常的 XML 文件
+	 * @param：xml文件所在的位置
+	 * @throws DocumentException 
+	 * @throws IOException 
+	 */
+	public String formatXmlFile(String xmlPath) throws DocumentException, IOException{
+		SAXReader reader=new SAXReader();
+        Document fromXml=reader.read(new FileInputStream(new File(xmlPath))); //直接 new File 在服务器上有时候不好使。
+        String asXML = fromXml.asXML();
+        String newXmlPath = formatXmlContent(asXML, xmlPath);
+        if (new File(newXmlPath).exists()) {
+			return newXmlPath;
+		}
+        return "0";
+	}
+	
+	/**
+	 * 将 错误的 xml 格式的字符串
+	 * 进行换行处理，并输出到文件中
+	 * 
+	 * Tag: 这一次的XML中有 ![CDATA[]] 的内容。针对他，进行了单独的处理
+	 * 
+	 * @param asXML：错误的字符串
+	 * @param xmlPath ：错误格式的XML文件位置
+	 * @return
+	 * @throws IOException 
+	 */
+	private String formatXmlContent(String asXML, String xmlPath) throws IOException {
+		String newXmlPath = xmlPath.substring(0,xmlPath.lastIndexOf(File.separator))+File.separator+"newFileXml.xml";
+		Writer writer = null;
+		BufferedWriter bw = null;
+		String[] split = asXML.split("><");
+		try {
+			writer = new FileWriter(newXmlPath);
+			bw = new BufferedWriter(writer);
+			for (int i = 0; i < split.length; i++) {
+				if (i == split.length-1) {
+					bw.write(split[i]);
+				}else if(split[i+1].contains("![CDATA[")){
+					bw.append(split[i]+"><");
+				}else if(split[i].contains("![CDATA[")){
+					bw.append(split[i]+"><");
+				}else {
+					bw.write(split[i]+">\n<");
+				}
+			}
+			bw.flush();
+		} finally {
+			bw.close();
+		}
+		return newXmlPath;
+	}
+	
 	/**
 	 * 将 String 类型的 XML 加空格和回车
 	 * @param string
